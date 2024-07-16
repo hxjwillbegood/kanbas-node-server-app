@@ -1,11 +1,11 @@
 {
-  "type": "module", 
+  "type": "module",
   "name": "kanbas-node-server-app",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "test": "echo \"Error: no test specified\" && exit 1",
-  "start": "node App.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node App.js"
   },
   "author": "Xuejing Huang",
   "license": "ISC",
@@ -21,6 +21,7 @@
     "CS4550"
   ],
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2"
   }
 }
