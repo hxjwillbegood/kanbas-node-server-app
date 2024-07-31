@@ -1,41 +1,37 @@
-import db from "../Database/index.js";
-export default function ModuleRoutes(app) {
-    //update modules
-    app.put("/api/modules/:mid", (req, res) => {
-        const { mid } = req.params;
-        const moduleIndex = db.modules.findIndex(
-          (m) => m._id === mid);
-        db.modules[moduleIndex] = {
-          ...db.modules[moduleIndex],
-          ...req.body
-        };
-        res.sendStatus(204);
-      });
-    
-    //delete modules
-    app.delete("/api/modules/:mid", (req, res) => {
-        const { mid } = req.params;
-        db.modules = db.modules.filter((m) => m._id !== mid);
-        res.sendStatus(200);
-    });
-    
-    //create modules
-        app.post("/api/courses/:cid/modules", (req, res) => {
-            const { cid } = req.params;
-            const newModule = {
-            ...req.body,
-            course: cid,
-            _id: new Date().getTime().toString(),
-            };
-            db.modules.push(newModule);
-            res.send(newModule);
-    });
+import * as daos from "./dao.js";
+import { ObjectId } from "mongodb";
 
-    //get modules
-    app.get("/api/courses/:cid/modules", (req, res) => {
+export default function ModuleRoutes(app) {
+    // Fetch modules by course ID
+    app.get("/api/courses/:cid/modules", async (req, res) => {
         const { cid } = req.params;
-        const modules = db.modules.filter((m) => m.course === cid);
+        const modules = await daos.findModulesByCourseId(cid);
         res.json(modules);
     });
-    }
 
+    // Add a new module
+    app.post("/api/courses/:cid/modules", async (req, res) => {
+        const { cid } = req.params;
+        const newModule = {
+            ...req.body,
+            course: cid,
+            _id: new ObjectId(),
+        };
+        await daos.createModule(newModule);
+        res.send(newModule);
+    });
+
+    // Update a module by ID
+    app.put("/api/modules/:mid", async (req, res) => {
+        const { mid } = req.params;
+        const updatedModule = await daos.updateModule(mid, req.body);
+        res.sendStatus(204);
+    });
+
+    // Delete a module by ID
+    app.delete("/api/modules/:mid", async (req, res) => {
+        const { mid } = req.params;
+        await daos.deleteModule(mid);
+        res.sendStatus(200);
+    });
+}
